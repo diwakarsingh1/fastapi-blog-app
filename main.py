@@ -55,3 +55,16 @@ def destroy(db: db_dependency, id: int, response: Response):
     return {"detail" : f"Blog id with {id} deleted from the database"}
 
 
+@app.put('/update-blog/{id}')
+def update_blog(db: db_dependency, update_data: schemas.Create_Blog, id: int):
+    blog_query = db.query(models.Create_Blog).filter(models.Create_Blog.id == id)
+    blog = blog_query.first()
+    if not blog:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No blog id {id} to update."
+        )
+    blog_query.update(update_data.model_dump(), synchronize_session=False)
+    db.commit()
+
+    
